@@ -2,7 +2,7 @@
   "name": "server",
   "version": "1.0.0",
   "description": "A full stack project which will help students to practice.Its basically integration of code editing environment with linkedin like thiing",
-  "main": "src/app.js",
+  "main": "src/index.js",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "dotenv": "^16.4.7",
-    "express": "^4.21.2"
+    "express": "^4.21.2",
+    "mongoose": "^8.9.5"
   }
 }

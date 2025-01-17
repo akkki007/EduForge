@@ -1,152 +1,60 @@
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import Container from "@mui/material/Container";
-import InputLabel from "@mui/material/InputLabel";
-import Link from "@mui/material/Link";
-import Stack from "@mui/material/Stack";
-import TextField from "@mui/material/TextField";
-import Typography from "@mui/material/Typography";
-import visuallyHidden from "@mui/utils/visuallyHidden";
-import { styled } from "@mui/material/styles";
-
-const StyledBox = styled("div")(({ theme }) => ({
-  alignSelf: "center",
-  width: "100%",
-  height: 400,
-  marginTop: theme.spacing(8),
-  borderRadius: (theme.vars || theme).shape.borderRadius,
-  outline: "6px solid",
-  outlineColor: "hsla(220, 25%, 80%, 0.2)",
-  border: "1px solid",
-  borderColor: (theme.vars || theme).palette.grey[200],
-  boxShadow: "0 0 12px 8px hsla(220, 25%, 80%, 0.2)",
-  backgroundImage: `url(${"https://mui.com"}/static/screenshots/material-ui/getting-started/templates/dashboard.jpg)`,
-  backgroundSize: "cover",
-  [theme.breakpoints.up("sm")]: {
-    marginTop: theme.spacing(10),
-    height: 700,
-  },
-  ...theme.applyStyles("dark", {
-    boxShadow: "0 0 24px 12px hsla(210, 100%, 25%, 0.2)",
-    backgroundImage: `url(${"https://mui.com"}/static/screenshots/material-ui/getting-started/templates/dashboard-dark.jpg)`,
-    outlineColor: "hsla(220, 20%, 42%, 0.1)",
-    borderColor: (theme.vars || theme).palette.grey[700],
-  }),
-}));
-
-export default function Hero() {
+function Hero() {
   return (
-    <Box
-      id="hero"
-      sx={(theme) => ({
-        width: "100%",
-        backgroundRepeat: "no-repeat",
-        backgroundImage:
-          "radial-gradient(ellipse 80% 50% at 50% -20%, hsl(210, 100%, 90%), transparent)",
-        ...theme.applyStyles("dark", {
-          backgroundImage:
-            "radial-gradient(ellipse 80% 50% at 50% -20%, hsl(210, 100%, 16%), transparent)",
-        }),
-      })}
-    >
-      <Container
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          pt: { xs: 14, sm: 20 },
-          pb: { xs: 8, sm: 12 },
-        }}
-      >
-        <Stack
-          spacing={2}
-          useFlexGap
-          sx={{ alignItems: "center", width: { xs: "100%", sm: "70%" } }}
-        >
-          <Typography
-            className="xs:flex xs:flex-col"
-            variant="h1"
-            sx={{
-              display: "flex",
-              flexDirection: { xs: "column", sm: "row" },
-              alignItems: "center",
-              fontSize: "clamp(2rem, 10vw, 3.5rem)",
-            }}
-          >
-            Collaborative&nbsp;Innovative&nbsp;
-            <Typography
-              component="span"
-              variant="h1"
-              sx={(theme) => ({
-                fontSize: "inherit",
-                color: "primary.main",
-                ...theme.applyStyles("dark", {
-                  color: "primary.light",
-                }),
-              })}
-            >
-              Empowering
-            </Typography>
-          </Typography>
-          <Typography
-            sx={{
-              textAlign: "center",
-              color: "text.secondary",
-              width: { sm: "100%", md: "80%" },
-            }}
-          >
-            Explore a platform where educators and learners unite to share
-            knowledge, foster growth, and achieve excellence. Elevate your
-            journey with innovative tools and resources tailored to your
-            educational needs
-          </Typography>
-          <Stack
-            direction={{ xs: "column", sm: "row" }}
-            spacing={1}
-            useFlexGap
-            sx={{ pt: 2, width: { xs: "100%", sm: "350px" } }}
-          >
-            <InputLabel htmlFor="email-hero" sx={visuallyHidden}>
-              Email
-            </InputLabel>
-            <TextField
-              id="email-hero"
-              hiddenLabel
-              size="small"
-              variant="outlined"
-              aria-label="Enter your email address"
-              placeholder="Your email address"
-              fullWidth
-              slotProps={{
-                htmlInput: {
-                  autoComplete: "off",
-                  "aria-label": "Enter your email address",
-                },
-              }}
-            />
-            <Button
-              variant="contained"
-              color="primary"
-              size="small"
-              sx={{ minWidth: "fit-content" }}
-            >
-              Start now
-            </Button>
-          </Stack>
-          <Typography
-            variant="caption"
-            color="text.secondary"
-            sx={{ textAlign: "center" }}
-          >
-            By clicking &quot;Start now&quot; you agree to our&nbsp;
-            <Link href="#" color="primary">
-              Terms & Conditions
-            </Link>
-            .
-          </Typography>
-        </Stack>
-        <StyledBox id="image" />
-      </Container>
-    </Box>
+    <div className="xl:flex xl:flex-row flex flex-col">
+      <div className="relative isolate px-6 pt-14 lg:px-8">
+        <div
+          aria-hidden="true"
+          className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80"
+        ></div>
+        <div className="mx-auto -my-20 max-w-2xl py-32 sm:py-48 lg:py-56">
+          <div className="hidden sm:mb-8 sm:flex sm:justify-center">
+            <div className="relative rounded-full poppins-regular  px-3 py-1 text-md/6 text-gray-600 ring-1 ring-gray-900/10 hover:ring-gray-900/20">
+              Announcing our next round of funding.{" "}
+              <a href="#" className="poppins-semibold text-green-600">
+                <span aria-hidden="true" className="absolute inset-0" />
+                Read more <span aria-hidden="true">&rarr;</span>
+              </a>
+            </div>
+          </div>
+          <div className="text-center">
+            <h1 className="text-balance text-5xl poppins-semibold tracking-tight text-gray-900 sm:text-6xl">
+              Creating a learner community.
+            </h1>
+            <p className="mt-8 text-pretty text-lg poppins-medium text-gray-500 sm:text-xl/8">
+              Our platform bridges dedicated learners with expert educators,
+              creating a space where ideas thrive, skills develop, and
+              innovation flourishes.
+            </p>
+            <div className="mt-10 flex items-center justify-center gap-x-6">
+              <a
+                href="#"
+                className="rounded-md bg-green-600 px-3.5 py-2.5 text-sm poppins-semibold text-white shadow-sm hover:scale-110 transition-all hover:transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              >
+                Get started
+              </a>
+              <a href="#" className="text-sm/6 poppins-semibold text-gray-900">
+                Learn more <span aria-hidden="true">→</span>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div
+          aria-hidden="true"
+          className="absolute inset-x-0 top-[calc(100%-13rem)] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[calc(100%-30rem)]"
+        ></div>
+      </div>
+      <div className="w-[80%] -mt-5 mx-auto xl:w-[40vw] xl:mt-[15vw]">
+        <video
+          src="/bg.mp4"
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="w-full h-auto rounded-xl"
+        ></video>
+      </div>
+    </div>
   );
 }
+
+export default Hero;

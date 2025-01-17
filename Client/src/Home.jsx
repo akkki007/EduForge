@@ -1,34 +1,22 @@
-import CssBaseline from "@mui/material/CssBaseline";
-import Divider from "@mui/material/Divider";
-import AppTheme from "./shared-theme/AppTheme";
-import AppAppBar from "./components/AppBar";
-import Hero from "./components/Hero";
-import LogoCollection from "./components/LogoCollection";
-import Highlights from "./components/Highlights";
-import Features from "./components/Features";
-import Testimonials from "./components/Testimonials";
+"use client";
+
+import Bento from "./components/Bento";
+import Colleges from "./components/Colleges";
+import Cta from "./components/Cta";
 import FAQ from "./components/FAQ";
-import Footer from "./components/Footer";
-import "./index.css";
-export default function MarketingPage(props) {
+import { FooterWithSocialLinks } from "./components/Footer";
+import Header from "./components/Header";
+import Hero from "./components/Hero";
+export default function Home() {
   return (
-    <AppTheme {...props}>
-      <CssBaseline enableColorScheme />
-      <AppAppBar />
+    <div className="bg-white">
+      <Header />;
       <Hero />
-      <div>
-        <LogoCollection />
-        <Features />
-        <Divider />
-        <Testimonials />
-        <Divider />
-        <Highlights />
-        <Divider />
-        <Divider />
-        <FAQ />
-        <Divider />
-        <Footer />
-      </div>
-    </AppTheme>
+      <Cta />
+      <Bento />
+      <Colleges />
+      <FAQ />
+      <FooterWithSocialLinks />
+    </div>
   );
 }

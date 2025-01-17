@@ -1,150 +1,80 @@
-import * as React from 'react';
-import Accordion from '@mui/material/Accordion';
-import AccordionDetails from '@mui/material/AccordionDetails';
-import AccordionSummary from '@mui/material/AccordionSummary';
-import Box from '@mui/material/Box';
-import Container from '@mui/material/Container';
-import Link from '@mui/material/Link';
-import Typography from '@mui/material/Typography';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+"use client";
+import { useState } from "react";
+import { ChevronDownIcon } from "lucide-react";
+
+const faqData = [
+  {
+    question: "What is React?",
+    answer:
+      "React is a popular JavaScript library for building user interfaces, particularly single-page applications. It's used for handling the view layer in web and mobile apps.",
+  },
+  {
+    question: "What is Tailwind CSS?",
+    answer:
+      "Tailwind CSS is a utility-first CSS framework that allows you to build custom designs without ever leaving your HTML. It provides low-level utility classes that let you build completely custom designs.",
+  },
+  {
+    question: "How do I install React?",
+    answer:
+      "You can create a new React project using Create React App. Run 'npx create-react-app my-app' in your terminal, replace 'my-app' with your project name.",
+  },
+  {
+    question: "Is Tailwind CSS difficult to learn?",
+    answer:
+      "While Tailwind has a learning curve, many developers find it intuitive once they get used to it. Its utility-first approach allows for rapid development and easy customization.",
+  },
+  {
+    question: "Can I use React with Tailwind CSS?",
+    answer:
+      "Yes, React and Tailwind CSS work great together! You can easily integrate Tailwind CSS into your React project for styling your components.",
+  },
+];
 
 export default function FAQ() {
-  const [expanded, setExpanded] = React.useState([]);
+  const [activeIndex, setActiveIndex] = useState(null);
 
-  const handleChange = (panel) => (event, isExpanded) => {
-    setExpanded(
-      isExpanded ? [...expanded, panel] : expanded.filter((item) => item !== panel),
-    );
+  const toggleQuestion = (index) => {
+    setActiveIndex(activeIndex === index ? null : index);
   };
 
   return (
-    <Container
-      id="faq"
-      sx={{
-        pt: { xs: 4, sm: 12 },
-        pb: { xs: 8, sm: 16 },
-        position: 'relative',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: { xs: 3, sm: 6 },
-      }}
-    >
-      <Typography
-        component="h2"
-        variant="h4"
-        sx={{
-          color: 'text.primary',
-          width: { sm: '100%', md: '60%' },
-          textAlign: { sm: 'left', md: 'center' },
-        }}
-      >
-        Frequently asked questions
-      </Typography>
-      <Box sx={{ width: '100%' }}>
-        <Accordion
-          expanded={expanded.includes('panel1')}
-          onChange={handleChange('panel1')}
-        >
-          <AccordionSummary
-            expandIcon={<ExpandMoreIcon />}
-            aria-controls="panel1d-content"
-            id="panel1d-header"
-          >
-            <Typography component="span" variant="subtitle2">
-              How do I contact customer support if I have a question or issue?
-            </Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Typography
-              variant="body2"
-              gutterBottom
-              sx={{ maxWidth: { sm: '100%', md: '70%' } }}
+    <div className="min-h-screen -mt-10 flex items-center justify-center  p-4 sm:p-8">
+      <div className="w-full max-w-3xl bg-white rounded-md shadow-xl overflow-hidden">
+        <div className=" p-8">
+          <h2 className="text-3xl poppins-bold text-center bg-gradient-to-r from-green-300 via-green-500 to-green-700 bg-clip-text text-transparent">
+            Frequently Asked Questions
+          </h2>
+        </div>
+        <div className="divide-y divide-gray-200">
+          {faqData.map((item, index) => (
+            <div
+              key={index}
+              className="p-6 cursor-pointer"
+              onClick={() => toggleQuestion(index)}
             >
-              You can reach our customer support team by emailing&nbsp;
-              <Link href="mailto:support@email.com">support@email.com</Link>
-              &nbsp;or calling our toll-free number. We&apos;re here to assist you
-              promptly.
-            </Typography>
-          </AccordionDetails>
-        </Accordion>
-        <Accordion
-          expanded={expanded.includes('panel2')}
-          onChange={handleChange('panel2')}
-        >
-          <AccordionSummary
-            expandIcon={<ExpandMoreIcon />}
-            aria-controls="panel2d-content"
-            id="panel2d-header"
-          >
-            <Typography component="span" variant="subtitle2">
-              Can I return the product if it doesn&apos;t meet my expectations?
-            </Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Typography
-              variant="body2"
-              gutterBottom
-              sx={{ maxWidth: { sm: '100%', md: '70%' } }}
-            >
-              Absolutely! We offer a hassle-free return policy. If you&apos;re not
-              completely satisfied, you can return the product within [number of
-              days] days for a full refund or exchange.
-            </Typography>
-          </AccordionDetails>
-        </Accordion>
-        <Accordion
-          expanded={expanded.includes('panel3')}
-          onChange={handleChange('panel3')}
-        >
-          <AccordionSummary
-            expandIcon={<ExpandMoreIcon />}
-            aria-controls="panel3d-content"
-            id="panel3d-header"
-          >
-            <Typography component="span" variant="subtitle2">
-              What makes your product stand out from others in the market?
-            </Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Typography
-              variant="body2"
-              gutterBottom
-              sx={{ maxWidth: { sm: '100%', md: '70%' } }}
-            >
-              Our product distinguishes itself through its adaptability, durability,
-              and innovative features. We prioritize user satisfaction and
-              continually strive to exceed expectations in every aspect.
-            </Typography>
-          </AccordionDetails>
-        </Accordion>
-        <Accordion
-          expanded={expanded.includes('panel4')}
-          onChange={handleChange('panel4')}
-        >
-          <AccordionSummary
-            expandIcon={<ExpandMoreIcon />}
-            aria-controls="panel4d-content"
-            id="panel4d-header"
-          >
-            <Typography component="span" variant="subtitle2">
-              Is there a warranty on the product, and what does it cover?
-            </Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Typography
-              variant="body2"
-              gutterBottom
-              sx={{ maxWidth: { sm: '100%', md: '70%' } }}
-            >
-              Yes, our product comes with a [length of warranty] warranty. It covers
-              defects in materials and workmanship. If you encounter any issues
-              covered by the warranty, please contact our customer support for
-              assistance.
-            </Typography>
-          </AccordionDetails>
-        </Accordion>
-      </Box>
-    </Container>
+              <div className="flex justify-between items-center">
+                <h3 className="text-lg poppins-medium text-gray-900">
+                  {item.question}
+                </h3>
+                <ChevronDownIcon
+                  className={`w-5 h-5 text-green-500 transition-transform duration-200 ${
+                    activeIndex === index ? "transform rotate-180" : ""
+                  }`}
+                />
+              </div>
+              <div
+                className={`mt-3 text-gray-600 poppins-regular transition-all duration-300 ease-in-out overflow-hidden ${
+                  activeIndex === index
+                    ? "max-h-40 opacity-100"
+                    : "max-h-0 opacity-0"
+                }`}
+              >
+                <p>{item.answer}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }
