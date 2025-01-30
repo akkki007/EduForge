@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogPanel } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Link } from "react-router-dom";
-import logo from "/logo.jpeg";
+import Cookies from "js-cookie"; // Import js-cookie
+import logo from "/logo.png";
 
 function Header() {
   const navigation = [
@@ -11,9 +12,36 @@ function Header() {
     { name: "About", href: "/about" },
     { name: "Courses", href: "/courses" },
   ];
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    // Check JWT token in cookies
+    const token = Cookies.get("jwt");
+
+    if (token) {
+      setIsAuthenticated(true);
+      
+
+      const adminToken = Cookies.get("adminToken");
+      if (adminToken) {
+        setIsAdmin(true);
+      }
+    }
+  }, []);
+
+  // Logout function
+  const handleLogout = () => {
+    Cookies.remove("jwt"); // Remove JWT token from cookies
+    Cookies.remove("adminToken"); // Remove admin token if exists
+    setIsAuthenticated(false);
+    setIsAdmin(false);
+  };
+
   return (
-    <header className="absolute inset-x-0 top-0 z-50">
+    <header className="absolute inset-x-0 top-[-5%] z-50">
       <nav
         aria-label="Global"
         className="flex items-center justify-between p-6 lg:px-8"
@@ -21,7 +49,7 @@ function Header() {
         <div className="flex lg:flex-1">
           <Link to="/" className="-m-1.5 p-1.5">
             <span className="sr-only">EduForge</span>
-            <img alt="" src={logo} className="h-16 w-auto" />
+            <img alt="" src={logo} className="h-40 w-auto" />
           </Link>
         </div>
         <div className="flex lg:hidden">
@@ -46,20 +74,48 @@ function Header() {
           ))}
         </div>
         <div className="hidden lg:flex lg:flex-1 lg:gap-5 lg:mr-14 lg:justify-end">
-          <Link
-            to="/sign-up"
-            className="text-md/6 poppins-semibold font-semibold text-gray-900"
-          >
-            Sign Up
-          </Link>
-          <Link
-            to="/login"
-            className="text-md/6 poppins-semibold font-semibold text-gray-900"
-          >
-            Log in
-          </Link>
+          {!isAuthenticated ? (
+            <>
+              <Link
+                to="/sign-up"
+                className="text-md/6 poppins-semibold font-semibold text-zinc-600 hover:text-zinc-900"
+              >
+                Sign Up
+              </Link>
+              <Link
+                to="/login"
+                className="text-md/6 poppins-semibold font-semibold text-zinc-600 hover:text-zinc-900"
+              >
+                Log in
+              </Link>
+              <Link
+                to="/admin-login"
+                className="text-md/6 poppins-semibold font-semibold text-zinc-600 hover:text-zinc-900"
+              >
+                Admin Login
+              </Link>
+            </>
+          ) : (
+            <>
+              {isAdmin && (
+                <Link
+                  to="/admin-dashboard"
+                  className="text-md/6 poppins-semibold font-semibold text-green-600 hover:text-green-800"
+                >
+                  Admin Dashboard
+                </Link>
+              )}
+              <button
+                onClick={handleLogout}
+                className="text-md/6 poppins-semibold font-semibold text-red-600 hover:text-red-800"
+              >
+                Logout
+              </button>
+            </>
+          )}
         </div>
       </nav>
+      {/* Mobile Menu */}
       <Dialog
         open={mobileMenuOpen}
         onClose={setMobileMenuOpen}
@@ -71,7 +127,6 @@ function Header() {
             <Link to="/" className="-m-1.5 p-1.5">
               <img alt="" src={logo} className="h-16 w-auto" />
             </Link>
-
             <button
               type="button"
               onClick={() => setMobileMenuOpen(false)}
@@ -95,18 +150,45 @@ function Header() {
                 ))}
               </div>
               <div className="py-6 flex flex-col gap-y-4">
-                <Link
-                  to="/sign-up"
-                  className="text-md/6 poppins-semibold font-semibold text-gray-900"
-                >
-                  Sign Up
-                </Link>
-                <Link
-                  to="/login"
-                  className="text-md/6 poppins-semibold font-semibold text-gray-900"
-                >
-                  Log in
-                </Link>
+                {!isAuthenticated ? (
+                  <>
+                    <Link
+                      to="/sign-up"
+                      className="text-md/6 poppins-semibold font-semibold text-gray-900"
+                    >
+                      Sign Up
+                    </Link>
+                    <Link
+                      to="/login"
+                      className="text-md/6 poppins-semibold font-semibold text-gray-900"
+                    >
+                      Log in
+                    </Link>
+                    <Link
+                      to="/admin-login"
+                      className="text-md/6 poppins-semibold font-semibold text-gray-900"
+                    >
+                      Admin Login
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    {isAdmin && (
+                      <Link
+                        to="/admin-dashboard"
+                        className="text-md/6 poppins-semibold font-semibold text-green-600"
+                      >
+                        Admin Dashboard
+                      </Link>
+                    )}
+                    <button
+                      onClick={handleLogout}
+                      className="text-md/6 poppins-semibold font-semibold text-red-600"
+                    >
+                      Logout
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           </div>

@@ -1,60 +1,49 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "./components/Header";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-export default function Login() {
-  const [isTeacher, setIsTeacher] = useState(true);
+export default function AdminLogin() {
   const [loading, setLoading] = useState(false);
-  const [teacherLogin, setTeacherLogin] = useState({ email: "", password: "" });
-  const [studentLogin, setStudentLogin] = useState({ email: "", password: "" });
+  const [adminLogin, setAdminLogin] = useState({ email: "", password: "" });
+  const navigate = useNavigate();
 
   const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-  const handleTeacherChange = (e) => {
-    setTeacherLogin({ ...teacherLogin, [e.target.name]: e.target.value });
-  };
-
-  const handleStudentChange = (e) => {
-    setStudentLogin({ ...studentLogin, [e.target.name]: e.target.value });
+  const handleAdminChange = (e) => {
+    setAdminLogin({ ...adminLogin, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const loginData = isTeacher ? teacherLogin : studentLogin;
+    const { email, password } = adminLogin;
 
     // Validate inputs
-    if (!loginData.email || !loginData.password) {
+    if (!email || !password) {
       toast.error("All fields are required");
       return;
     }
-    if (!validateEmail(loginData.email)) {
+    if (!validateEmail(email)) {
       toast.error("Invalid email address");
       return;
     }
 
     setLoading(true);
     try {
-      const response = await fetch(
-        isTeacher ? "http://localhost:3000/teacherLogin" : "http://localhost:3000/studentLogin",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(loginData),
-        }
-      );
+      const response = await fetch("http://localhost:4000/adminLogin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: 'include',
+        body: JSON.stringify(adminLogin),
+      });
 
       const data = await response.json();
 
       if (data.success) {
         toast.success(data.message);
-        // i want the teacher to be redirected to the teacher dashboard and the student to the student dashboard
-        if (isTeacher) {
-          history.push("/teacher-dashboard");
-        } else {
-          history.push("/student-dashboard");
-        }
+        navigate("/admin"); // Correctly navigate to the admin dashboard
       } else {
         toast.error(data.message || "Invalid credentials");
       }
@@ -72,14 +61,8 @@ export default function Login() {
       <div className="flex min-h-full flex-1 flex-col justify-center px-6 mt-20 py-12 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <h2 className="mt-10 text-center text-2xl/9 poppins-bold tracking-tight text-gray-900">
-            {isTeacher ? "Teacher Login" : "Student Login"}
+            Admin Login
           </h2>
-          <button
-            onClick={() => setIsTeacher(!isTeacher)}
-            className="mt-4 text-sm text-green-600 underline"
-          >
-            {isTeacher ? "Switch to Student Login" : "Switch to Teacher Login"}
-          </button>
         </div>
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
@@ -98,8 +81,8 @@ export default function Login() {
                   type="email"
                   required
                   autoComplete="email"
-                  value={isTeacher ? teacherLogin.email : studentLogin.email}
-                  onChange={isTeacher ? handleTeacherChange : handleStudentChange}
+                  value={adminLogin.email}
+                  onChange={handleAdminChange}
                   className="block w-full rounded-md poppins-regular bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                 />
               </div>
@@ -119,8 +102,8 @@ export default function Login() {
                   type="password"
                   required
                   autoComplete="current-password"
-                  value={isTeacher ? teacherLogin.password : studentLogin.password}
-                  onChange={isTeacher ? handleTeacherChange : handleStudentChange}
+                  value={adminLogin.password}
+                  onChange={handleAdminChange}
                   className="block w-full rounded-md poppins-regular bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                 />
               </div>
@@ -142,12 +125,9 @@ export default function Login() {
           </form>
 
           <p className="mt-10 text-center poppins-regular text-sm/6 text-gray-500">
-            Not a member?{" "}
-            <a
-              href="/signup"
-              className="poppins-semibold text-green-600 hover:text-green-500"
-            >
-              Register Here
+            Not an admin?{" "}
+            <a href="/login" className="text-green-600 hover:underline">
+              Log in as a teacher or student
             </a>
           </p>
         </div>

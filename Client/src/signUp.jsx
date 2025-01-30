@@ -129,7 +129,7 @@ export default function SignUp() {
     setLoading(true);
     try {
       const response = await fetch(
-        isTeacher ? "http://localhost:3000/teacherSignup" : "http://localhost:3000/studentSignUp",
+        isTeacher ? "http://localhost:4000/teacherSignup" : "http://localhost:4000/studentSignUp",
         {
           method: "POST",
           headers: {
@@ -143,7 +143,6 @@ export default function SignUp() {
 
       if (data.success) {
         toast.success(data.message);
-        window.location.href = "/login";
       } else {
         toast.error(data.message || "An error occurred during signup");
       }

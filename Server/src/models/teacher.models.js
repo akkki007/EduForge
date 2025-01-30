@@ -21,7 +21,18 @@ const teacherSchema = new Schema({
     password: {
         type: String,
         required: true
-    }
+    },
+    // change accepted to status and limit to three values "pending", "accepted", "declined"
+    status: {
+        type: String,
+        enum: ["pending", "accepted", "declined"],
+        default: "pending"
+    },
+    subject: {
+        type: String,
+        default: "JavaScript",
+        required: true
+    },
 });
 
 const Teacher = model('Teacher', teacherSchema);

@@ -27,7 +27,12 @@ const userSchema = new Schema({
     createdAt: {
         type: Date,
         default: Date.now
-    }
+    },
+    status: {
+        type: String,
+        enum: ["pending", "accepted", "declined"],
+        default: "pending"
+    },
 });
 
 const User = model('User', userSchema);
