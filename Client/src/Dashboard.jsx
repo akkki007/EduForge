@@ -33,7 +33,7 @@ function PageContent({ pathname }) {
     </>
   );
 }
-function TeaDashboard() {
+function Dashboard() {
   const router = useDemoRouter("/dashboard");
 
   return (
@@ -65,5 +65,4 @@ function TeaDashboard() {
     </AppProvider>
   );
 }
-
-export default TeaDashboard;
+export default Dashboard;
