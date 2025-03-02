@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { Dialog, DialogPanel } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
-import { Link } from "react-router-dom";
-import Cookies from "js-cookie"; // Import js-cookie
+import { Link, redirect } from "react-router-dom";
 import logo from "/logo.png";
 
 function Header() {
@@ -17,27 +16,35 @@ function Header() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
 
+  function getCookie(name) {
+    const cookies = document.cookie.split('; ');
+    for (const cookie of cookies) {
+        const [key, value] = cookie.split('=');
+        if (key === name) {
+          return value;
+        }
+    }
+    return null;
+  }
+
   useEffect(() => {
     // Check JWT token in cookies
-    const token = Cookies.get("jwt");
-
-    if (token) {
+    const token = getCookie('jwt');
+    
+    if (token!=null) {
       setIsAuthenticated(true);
-      
-
-      const adminToken = Cookies.get("adminToken");
-      if (adminToken) {
-        setIsAdmin(true);
-      }
+      setIsAdmin(true);
     }
   }, []);
 
+
   // Logout function
   const handleLogout = () => {
-    Cookies.remove("jwt"); // Remove JWT token from cookies
-    Cookies.remove("adminToken"); // Remove admin token if exists
+    document.cookie = "jwt=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+    document.cookie = "adminToken=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
     setIsAuthenticated(false);
     setIsAdmin(false);
+    redirect("/");
   };
 
   return (

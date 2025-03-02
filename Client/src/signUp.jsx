@@ -38,11 +38,10 @@ export default function SignUp() {
     return re.test(String(fullname).toLowerCase());
     };
 
-    //password must be of atleast 6 character validation
     const validatePassword = (password) => {
       const re = /^[a-zA-Z0-9]{6,}$/;
-      return re.test(String(password).toLowerCase());
-      }
+      return re.test(String(password));
+    };
 
 
   const validatePhoneNumber = (phoneNumber) => {

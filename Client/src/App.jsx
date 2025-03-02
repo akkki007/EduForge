@@ -3,9 +3,9 @@ import Home from "./Home";
 import NotFound from "./NotFound";
 import SignUp from "./signUp";
 import Login from "./Login";
-import Playground from "./components/playdir/Playground";
 import TeaDashboard from "./TeaDashboard";
 import AdminDashboard from "./AdminDashboard";
+import StuDashboard from "./StuDashboard"
 import AdminLogin from "./AdminLogin";
 function App() {
   return (
@@ -15,8 +15,8 @@ function App() {
         {/*<Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} /> */}
         <Route path="/login" element={<Login />} />
-        <Route path="/teaDashboard" element={<TeaDashboard />} />
-        <Route path="/playground" element={<Playground />} />
+        <Route path="/teacherDashboard" element={<TeaDashboard />} />
+        <Route path="/studentDashboard" element={<StuDashboard/>} />
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="*" element={<NotFound />} />
         <Route path="/admin" element={<AdminDashboard />} />

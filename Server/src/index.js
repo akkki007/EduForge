@@ -187,6 +187,10 @@ app.post("/teacherSignUp", async (req, res) => {
   }
 });
 
+app.get("/user", async(req,res)=>{
+    
+})
+
 //create a signin route for student
 app.post("/studentLogin", async (req, res) => {
   try {
@@ -263,9 +267,12 @@ app.post("/studentLogin", async (req, res) => {
   }
 });
 app.post("/teacherLogin", async (req, res) => {
-  try {
-    const { email, password } = req.body;
 
+  try {
+    connectDB();
+    const { email, password } = req.body;
+    console.log(req.body);
+    
     // Validate required fields
     if (!email || !password) {
       return res.status(400).json({
@@ -275,17 +282,23 @@ app.post("/teacherLogin", async (req, res) => {
     }
 
     // Check if teacher exists
-    const teacher = await Teacher.findOne({ email });
+    const teacher = await Teacher.findOne({ email:email });
     if (!teacher) {
       return res.status(404).json({
         success: false,
         message: 'Teacher not found. Please register first.',
       });
     }
-    if(!teacher.accepted){
+    if(teacher.status=="pending"){
       return res.status(400).json({
         success: false,
         message: 'Teacher not accepted. Please wait for the admin to accept your account.Your login credentials will be sent to you via email.',
+      });
+    }
+    if(teacher.status=="declined"){
+      return res.status(400).json({
+        success: false,
+        message: 'Teacher request is declined. Please contact the admin to accept your account.Your login credentials will be sent to you via email.',
       });
     }
 
@@ -306,10 +319,13 @@ app.post("/teacherLogin", async (req, res) => {
     );
 
     // Add JWT token to the response cookie
-    res.cookie('jwt', token, {
-      httpOnly: true,
-      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    res.cookie("jwt", token, {
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+      httpOnly: false, 
+      secure: true, // ✅ Required for `SameSite=None`
+      sameSite: "None", // ✅ Needed for cross-origin requests
     });
+    
 
     // Return success response
     return res.status(200).json({
@@ -396,7 +412,8 @@ app.post("/adminLogin", async (req, res) => {
     
     // Add JWT token to the response cookie
     res.cookie('jwt', token, {
-      httpOnly: true,
+      httpOnly: false,
+      secure:true,
       sameSite: 'None', // Enable cross-site cookies
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
     });
@@ -447,7 +464,14 @@ app.post("/admin/updateRequests", async (req, res) => {
             if (!teacher) {
                 return res.status(404).json({ error: 'Teacher not found' });
             }
+            const msg = {
+              to: teacher.email,
+              from: 'akshaynazare3@gmail.com',
+              subject: 'Status Update Notification',
+              text: `Your status has been updated to: ${status}`,
+          };
 
+          await sgMail.send(msg);
             return res.status(200).json({ message: 'Teacher status updated successfully' });
         }
 

@@ -1,15 +1,25 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom"; // ✅ Import useNavigate
 import Header from "./components/Header";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import Cookies from "js-cookie";
 export default function Login() {
+  const navigate = useNavigate(); // ✅ Use useNavigate for redirection
   const [isTeacher, setIsTeacher] = useState(true);
   const [loading, setLoading] = useState(false);
   const [teacherLogin, setTeacherLogin] = useState({ email: "", password: "" });
   const [studentLogin, setStudentLogin] = useState({ email: "", password: "" });
 
   const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+  useEffect(() => {
+    const token = document.cookie.length
+    if (token) {
+      navigate(isTeacher ? "/teacherDashboard" : "/studentDashboard");
+    }
+  }, [isTeacher, navigate]);
+  
 
   const handleTeacherChange = (e) => {
     setTeacherLogin({ ...teacherLogin, [e.target.name]: e.target.value });
@@ -37,11 +47,12 @@ export default function Login() {
     setLoading(true);
     try {
       const response = await fetch(
-        isTeacher ? "http://localhost:3000/teacherLogin" : "http://localhost:3000/studentLogin",
+        isTeacher ? "http://localhost:4000/teacherLogin" : "http://localhost:4000/studentLogin",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(loginData),
+          credentials: "include"
         }
       );
 
@@ -49,12 +60,9 @@ export default function Login() {
 
       if (data.success) {
         toast.success(data.message);
-        // i want the teacher to be redirected to the teacher dashboard and the student to the student dashboard
-        if (isTeacher) {
-          history.push("/teacher-dashboard");
-        } else {
-          history.push("/student-dashboard");
-        }
+        setTimeout(() => {
+          navigate(isTeacher ? "/teacherDashboard" : "/studentDashboard"); // ✅ Use navigate
+        }, 1000); // Add delay for better UX
       } else {
         toast.error(data.message || "Invalid credentials");
       }
@@ -85,10 +93,7 @@ export default function Login() {
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label
-                htmlFor="email"
-                className="block text-sm/6 poppins-medium text-gray-900"
-              >
+              <label htmlFor="email" className="block text-sm/6 poppins-medium text-gray-900">
                 Email address
               </label>
               <div className="mt-2">
@@ -106,10 +111,7 @@ export default function Login() {
             </div>
 
             <div>
-              <label
-                htmlFor="password"
-                className="block text-sm/6 poppins-medium text-gray-900"
-              >
+              <label htmlFor="password" className="block text-sm/6 poppins-medium text-gray-900">
                 Password
               </label>
               <div className="mt-2">
@@ -143,10 +145,7 @@ export default function Login() {
 
           <p className="mt-10 text-center poppins-regular text-sm/6 text-gray-500">
             Not a member?{" "}
-            <a
-              href="/signup"
-              className="poppins-semibold text-green-600 hover:text-green-500"
-            >
+            <a href="/signup" className="poppins-semibold text-green-600 hover:text-green-500">
               Register Here
             </a>
           </p>
