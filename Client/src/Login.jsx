@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom"; // ✅ Import useNavigate
 import Header from "./components/Header";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Cookies from "js-cookie";
+import { createStore } from "redux";
 export default function Login() {
   const navigate = useNavigate(); // ✅ Use useNavigate for redirection
   const [isTeacher, setIsTeacher] = useState(true);
@@ -13,12 +13,24 @@ export default function Login() {
 
   const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
+  function getCookie(name) {
+    const cookies = document.cookie.split('; ');
+    for (const cookie of cookies) {
+        const [key, value] = cookie.split('=');
+        if (key === name) {
+          return value;
+        }
+    }
+    return null;
+  }
+
   useEffect(() => {
-    const token = document.cookie.length
+    const token = getCookie('jwt')
     if (token) {
       navigate(isTeacher ? "/teacherDashboard" : "/studentDashboard");
     }
   }, [isTeacher, navigate]);
+  
   
 
   const handleTeacherChange = (e) => {

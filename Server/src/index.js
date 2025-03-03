@@ -1,5 +1,5 @@
 import { app } from "./app.js";
-import dotenv from "dotenv";
+
 import User from "./models/user.models.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -9,6 +9,8 @@ import connectDB from "./db/index.js";
 import Teacher from "./models/teacher.models.js";
 import cookieParser from "cookie-parser";
 import sgMail from "@sendgrid/mail"
+import supabase from "./supabase.js";
+import dotenv from "dotenv";
 dotenv.config();
 app.use(cookieParser());  
 const PORT = process.env.PORT || 7000;
@@ -321,9 +323,9 @@ app.post("/teacherLogin", async (req, res) => {
     // Add JWT token to the response cookie
     res.cookie("jwt", token, {
       maxAge: 24 * 60 * 60 * 1000, // 1 day
-      httpOnly: false, 
-      secure: true, // ✅ Required for `SameSite=None`
-      sameSite: "None", // ✅ Needed for cross-origin requests
+      httpOnly: false, // Allow frontend access
+      secure: false,   // Set to true if using HTTPS
+      sameSite: "Lax"
     });
     
 
@@ -522,6 +524,370 @@ app.post("/logout", (req, res) => {
       success: false,
       message: "Internal server error",
     });
+  }
+});
+app.post("/show", async (req, res) => {
+  if (!req.body.date || !req.body.division) {
+    return res.status(400).json({
+      error: "Missing required fields",
+      message: "Both date and division are required",
+    });
+  }
+  const { date, division } = req.body;
+
+  try {
+    const { data: attendanceData, error: attendanceError } = await supabase
+      .from("attendance")
+      .select("*")
+      .eq("pracdates", date)
+      .eq("division", division)
+      .order("enroll", { ascending: true });
+
+    if (attendanceError) {
+      console.error(
+        "Attendance query error for date:",
+        date,
+        "and division:",
+        division,
+        "Error:",
+        attendanceError
+      );
+      return res.status(500).json({
+        error: "Failed to fetch attendance data",
+        message: "Error querying attendance records",
+        details: attendanceError,
+      });
+    }
+
+    const { data: studentData, error: studentError } = await supabase
+      .from("students")
+      .select("studentname, division, enroll")
+      .eq("division", division);
+
+    if (studentError) {
+      console.error(
+        "Student query error for division:",
+        division,
+        "Error:",
+        studentError
+      );
+      return res.status(500).json({
+        error: "Failed to fetch student data",
+        message: "Error querying student records",
+        details: studentError,
+      });
+    }
+    const combData = combineResults(studentData, attendanceData || []);
+
+    return res.json(combData);
+  } catch (error) {
+    console.error("Detailed error:", error);
+    return res
+      .status(500)
+      .json({ error: "Server error", details: error.message });
+  }
+});
+
+const combineResults = (studentResults, otherData) => {
+  if (otherData.length === 0) {
+    return studentResults.map((student, index) => ({
+      id: index,
+      studentname: student.studentname,
+      enroll: student.enroll,
+      isPresent: false,
+    }));
+  } else {
+    return otherData.map((attendance, index) => {
+      const student = studentResults.find(
+        (student) => student.enroll === attendance.enroll
+      );
+      return {
+        id: index,
+        studentname: student ? student.studentname : "Unknown",
+        enroll: attendance.enroll,
+        isPresent: Boolean(attendance.ispresent),
+      };
+    });
+  }
+};
+
+app.post("/load", async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from("daterecord")
+      .select("*")
+      .order("pracdates", { ascending: false });
+
+    if (error) {
+      console.error("Error fetching date records. Error:", error);
+      return res.status(500).json({
+        error: "Failed to load date records",
+        message: "Error querying date records",
+        details: error,
+      });
+    }
+
+    if (!data || data.length === 0) {
+      console.log("No date records found");
+      return res.json({ user: [] });
+    }
+
+    return res.json({ user: data });
+  } catch (error) {
+    console.error("Server error:", error);
+    return res.status(500).json({ error: "Server error" });
+  }
+});
+
+app.post("/update", async (req, res) => {
+  if (!req.body.updatedRows || !req.body.date || !req.body.div) {
+    return res.status(400).json({
+      error: "Missing required fields",
+      message: "updatedRows, date, and div are all required",
+    });
+  }
+  const { updatedRows, date, div } = req.body;
+
+  try {
+    const promises = updatedRows.map(async (row) => {
+      const isPresent = row.isPresent ? true : false;
+
+      const { data, error } = await supabase
+        .from("attendance")
+        .select("*")
+        .eq("enroll", row.EnRoll)
+        .eq("pracdates", date)
+        .eq("division", div);
+      if (error) throw error;
+      if (data && data.length > 0) {
+        return supabase
+          .from("attendance")
+          .update({ ispresent: isPresent })
+          .eq("enroll", row.EnRoll)
+          .eq("pracdates", date)
+          .eq("division", div);
+      }
+    });
+
+    const results = await Promise.all(promises);
+
+    const errors = results.filter((result) => result.error);
+
+    if (errors.length > 0) {
+      console.error("Errors updating rows:", errors);
+      return res
+        .status(500)
+        .json({ error: "Database update error", details: errors });
+    }
+
+    res.status(200).json({ message: "All updates processed successfully." });
+  } catch (error) {
+    console.error("Error updating data:", error);
+    res.status(500).json({ error: "Server error", details: error.message });
+  }
+});
+
+app.post("/stud", async (req, res) => {
+  if (!req.body.division) {
+    return res.status(400).json({
+      error: "Missing required field",
+      message: "Division is required",
+    });
+  }
+  const { division } = req.body;
+
+  try {
+    const { data, error } = await supabase
+      .from("students")
+      .select("studentname, enroll")
+      .eq("division", division);
+
+    if (error) {
+      console.error(
+        "Error fetching students for division:",
+        division,
+        "Error:",
+        error
+      );
+      return res.status(500).json({
+        error: "Failed to fetch student list",
+        message: "Error querying student records",
+        details: error,
+      });
+    }
+
+    if (!data || data.length === 0) {
+      console.log("No student data found");
+      return res.json({ user: [] });
+    }
+
+    const formattedData = data.map((student) => ({
+      Name: student.studentname,
+      EnRoll: student.enroll,
+    }));
+
+    return res.json({ user: formattedData });
+  } catch (error) {
+    console.error("Server error:", error);
+    return res.status(500).json({ error: "Server error" });
+  }
+});
+
+app.post("/insert", async (req, res) => {
+  if (!req.body.updatedRows || !req.body.date || !req.body.div) {
+    return res.status(400).json({
+      error: "Missing required fields",
+      message: "updatedRows, date, and div are all required",
+    });
+  }
+  const { updatedRows, date, div } = req.body;
+
+  const filteredRows = updatedRows.map((stud) => ({
+    enroll: stud.EnRoll,
+    ispresent: stud.isPresent,
+    division: div,
+    pracdates: date,
+  }));
+
+  try {
+    const { data, error } = await supabase
+      .from("attendance")
+      .insert(filteredRows);
+    if (error) {
+      console.error("Error inserting attendance data:", error);
+    } else {
+      console.log("Attendance data inserted successfully");
+    }
+  } catch (error) {
+    console.log(error);
+  }
+
+  try {
+    const { data, error } = await supabase.from("daterecord").insert([
+      {
+        division: div,
+        pracdates: date,
+      },
+    ]);
+
+    if (error) {
+      console.error("Error inserting attendance data:", error);
+    } else {
+      console.log("Attendance data inserted successfully");
+    }
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+app.post("/marks", async (req, res) => {
+  if (!req.body.division || !req.body.subject) {
+    return res.status(400).json({
+      error: "Missing required fields",
+      message: "Both division and subject are required",
+    });
+  }
+  const { division, subject } = req.body;
+
+  try {
+    const { data: marksData, error: marksError } = await supabase
+      .from("student_marks")
+      .select("*")
+      .eq("div", division)
+      .eq("subject", subject)
+      .order("enroll", { ascending: true });
+
+    if (marksError) {
+      console.error(
+        "Marks query error for division:",
+        division,
+        "and subject:",
+        subject,
+        "Error:",
+        marksError
+      );
+      return res.status(500).json({
+        error: "Failed to fetch marks data",
+        message: "Error querying student marks",
+        details: marksError,
+      });
+    }
+    if (marksData.length === 0) {
+      return res.json({ message: "No Rows Found" });
+    }
+    const { data: students, error: studenterror } = await supabase
+      .from("students")
+      .select("studentname")
+      .eq("division", division)
+      .order("enroll", { ascending: true });
+    if (studenterror) {
+      console.error(
+        "Students query error for division:",
+        division,
+        "Error:",
+        studenterror
+      );
+      return res.status(500).json({
+        error: "Failed to fetch student names",
+        message: "Error querying student records",
+        details: studenterror,
+      });
+    }
+
+    for (let index = 0; index < students.length; index++) {
+      if (marksData[index]) {
+        marksData[index].id = index;
+        marksData[index].studentname = students[index].studentname;
+      }
+    }
+
+    return res.json(marksData);
+  } catch (error) {
+    console.error("Detailed error:", error);
+    return res
+      .status(500)
+      .json({ error: "Server error", details: error.message });
+  }
+});
+app.post("/updateMarks", async (req, res) => {
+  if (!req.body.division || !req.body.subject || !req.body.marks) {
+    return res.status(400).json({
+      error: "Missing required fields",
+      message: "Division, subject, and marks data are required",
+    });
+  }
+
+  const { division, subject, marks } = req.body;
+
+  try {
+    const updatePromises = marks.map(async (row) => {
+      const { id, enroll, studentname, ...scores } = row;
+
+      Object.keys(scores).forEach((key) => {
+        scores[key] = Number(scores[key]) || 0;
+      });
+
+      const { error } = await supabase
+        .from("student_marks")
+        .update(scores)
+        .eq("enroll", enroll)
+        .eq("div", division)
+        .eq("subject", subject);
+
+      if (error) {
+        console.error(`Error updating marks for ${enroll}:`, error);
+        throw error;
+      }
+    });
+
+    await Promise.all(updatePromises);
+
+    return res.status(200).json({ message: "Marks updated successfully" });
+  } catch (error) {
+    console.error("Error updating marks:", error);
+    return res
+      .status(500)
+      .json({ error: "Server error", details: error.message });
   }
 });
 

@@ -30,6 +30,7 @@ function Header() {
   useEffect(() => {
     // Check JWT token in cookies
     const token = getCookie('jwt');
+    console.log(token);
     
     if (token!=null) {
       setIsAuthenticated(true);

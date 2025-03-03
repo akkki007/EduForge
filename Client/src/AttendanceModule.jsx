@@ -13,28 +13,9 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
-import { useEffect } from "react"
+import Attendance from "./components/attendance"
 
 export default function Page() {
-
-  // function getCookie(name) {
-  //   const cookies = document.cookie.split('; ');
-  //   for (const cookie of cookies) {
-  //       const [key, value] = cookie.split('=');
-  //       if (key === name) {
-  //         return value;
-  //       }
-  //   }
-  //   return null;
-  // }
-
-  // useEffect(() => {
-  //   const token = getCookie('jwt')
-  //   if (token) {
-  //     navigate(isTeacher ? "/teacherDashboard" : "/studentDashboard");
-  //   }
-  // }, [isTeacher, navigate]);
-  
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -47,22 +28,18 @@ export default function Page() {
               <BreadcrumbList>
                 <BreadcrumbItem className="hidden md:block">
                   <BreadcrumbLink href="#">
-                    Building Your Application
+                    Mark respective attendance
                   </BreadcrumbLink>
                 </BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block" />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Data Fetching</BreadcrumbPage>
-                </BreadcrumbItem>
+                
               </BreadcrumbList>
             </Breadcrumb>
           </div>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
           <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-            Hii Teacher
-          </div>
-          
+            <Attendance/>
+          </div>   
         </div>
       </SidebarInset>
     </SidebarProvider>
