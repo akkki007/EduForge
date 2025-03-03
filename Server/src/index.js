@@ -596,7 +596,7 @@ const combineResults = (studentResults, otherData) => {
       enroll: student.enroll,
       isPresent: false,
     }));
-  } else {
+  } else {    
     return otherData.map((attendance, index) => {
       const student = studentResults.find(
         (student) => student.enroll === attendance.enroll

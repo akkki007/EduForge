@@ -82,7 +82,7 @@ export default function Attendance() {
             id: ind,
             studentname: value.studentname,
             EnRoll: value.enroll,
-            isPresent: value.ispresent,
+            isPresent: value.isPresent,
           }));
           console.log(newRows);
           setRows(newRows);
