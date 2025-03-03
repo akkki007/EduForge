@@ -58,17 +58,19 @@ export default function Attendance() {
   const [division, setDivision] = useState("H3");
   const [record, setRecord] = useState([]);
   const [isInsert, setInsert] = useState(true);
-
+  const [subject, setSubject] = useState("Android");
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await axios.post("http://192.168.121.47:5000/show", {
           date: date.format("YYYY-MM-DD"),
           division: division,
+          subject: subject,
         });
         if (response.data.length === 0) {
           const studData = await axios.post("http://192.168.121.47:5000/stud", {
             division: division,
+            subject: subject,
           });
           const newRows = studData.data.user.map((value, index) => ({
             id: index,
@@ -177,6 +179,22 @@ export default function Attendance() {
             <MenuItem value={"G3"}>G3</MenuItem>
             <MenuItem value={"H3"}>H3</MenuItem>
             <MenuItem value={"N3"}>N3</MenuItem>
+          </Select>
+        </Box>
+        <Box sx={{ minWidth: 120 }}>
+          <InputLabel id="subject-select-label">Subject</InputLabel>
+          <Select
+            labelId="subject-select-label"
+            id="subject-select"
+            value={subject}
+            label="Subject"
+            onChange={(e) => {
+              setSubject(e.target.value);
+            }}
+          >
+            <MenuItem value={"Android"}>Android</MenuItem>
+            <MenuItem value={"Python"}>Python</MenuItem>
+            <MenuItem value={"Java"}>Java</MenuItem>
           </Select>
         </Box>
       </div>

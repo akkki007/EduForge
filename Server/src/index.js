@@ -448,11 +448,9 @@ app.post("/admin/updateRequests", async (req, res) => {
       };
 
       await sgMail.send(msg);
-      return res
-        .status(200)
-        .json({
-          message: "Student status updated and email sent successfully",
-        });
+      return res.status(200).json({
+        message: "Student status updated and email sent successfully",
+      });
     }
 
     if (type === "teacher") {
@@ -526,7 +524,7 @@ app.post("/show", async (req, res) => {
       message: "Both date and division are required",
     });
   }
-  const { date, division } = req.body;
+  const { date, division, subject } = req.body;
 
   try {
     const { data: attendanceData, error: attendanceError } = await supabase
@@ -534,6 +532,7 @@ app.post("/show", async (req, res) => {
       .select("*")
       .eq("pracdates", date)
       .eq("division", division)
+      .eq("subject", subject)
       .order("enroll", { ascending: true });
 
     if (attendanceError) {
@@ -733,13 +732,14 @@ app.post("/insert", async (req, res) => {
       message: "updatedRows, date, and div are all required",
     });
   }
-  const { updatedRows, date, div } = req.body;
+  const { updatedRows, date, div, subject } = req.body;
 
   const filteredRows = updatedRows.map((stud) => ({
     enroll: stud.EnRoll,
     ispresent: stud.isPresent,
     division: div,
     pracdates: date,
+    subject: subject,
   }));
 
   try {
